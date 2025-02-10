@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - .:/app
+    env_file:
+      - .env.production
+    depends_on:
+      - db_primary
+      - db_secondary
+      - redis
+
+  db_primary:
+    image: mariadb:latest
+    environment:
+      MYSQL_USER: ${DB_USER_PRIMARY}
+      MYSQL_PASSWORD: ${DB_PASSWORD_PRIMARY}
+      MYSQL_DATABASE: ${DB_DATABASE_PRIMARY}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_PRIMARY}
+    ports:
+      - '${DB_PORT}:3306'
+    volumes:
+      - mariadb_primary_data:/var/lib/mysql
+
+volumes:
+  mariadb_primary_data:
